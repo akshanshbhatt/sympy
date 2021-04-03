@@ -1734,9 +1734,11 @@ def _solve(f, *symbols, **flags):
 
 
 def _solve_system(exprs, symbols, **flags):
+    from sympy.simplify.trigsimp import exptrigsimp
     if not exprs:
         return []
 
+    exprs = [exptrigsimp(expr.simplify()) for expr in exprs]
     if flags.pop('_split', True):
         # Split the system into connected components
         V = exprs
