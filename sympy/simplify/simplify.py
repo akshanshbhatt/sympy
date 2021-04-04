@@ -692,6 +692,9 @@ def simplify(expr, ratio=1.7, measure=count_ops, rational=False, inverse=False, 
     if expr.has(BesselBase):
         expr = besselsimp(expr)
 
+    if expr.has(TrigonometricFunction, HyperbolicFunction, ExpBase, exp):
+        expr = exptrigsimp(expr)
+
     if expr.has(TrigonometricFunction, HyperbolicFunction):
         expr = trigsimp(expr, deep=True)
 

@@ -83,7 +83,7 @@ def test_linearize_rolling_disc_kane():
     assert linearizer.f_a == f_v.diff(t).subs(KM.kindiffdict())
     sol = solve(linearizer.f_0 + linearizer.f_1, qd)
     for qi in qdots.keys():
-        assert sol[qi] == qdots[qi]
+        assert simplify(sol[qi]) == simplify(qdots[qi])
     assert simplify(linearizer.f_2 + linearizer.f_3 - fr - fr_star) == Matrix([0, 0, 0])
 
     # Perform the linearization
