@@ -1711,3 +1711,7 @@ def test_issue_21034():
     f = x*(-x**4/asin(5)**4 - x*sinh(x + log(asin(5))) + 5)
     assert integrate(f, x) == \
         -x**6/(6*asin(5)**4) - x**2*cosh(x + log(asin(5))) + 5*x**2/2 + 2*x*sinh(x + log(asin(5))) - 2*cosh(x + log(asin(5)))
+
+def test_issue_21034_f2():
+    f = (x + cosh(cos(4)))/(x*(x + 1/(12*x)))
+    assert integrate(f, x) == log(x**2 + 1/12)/2 + 2*sqrt(3)*cosh(cos(4))*atan(2*sqrt(3)*x)

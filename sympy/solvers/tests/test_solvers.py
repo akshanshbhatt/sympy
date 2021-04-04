@@ -2316,6 +2316,11 @@ def test_issue_20902():
     assert solve(f.subs({t: 3 * x + 2}).diff(x) > 0, x) == (S(-1) < x) & (x < S(-1)/3)
 
 
+def test_issue_21034():
+    assert solve([x + (-(6*exp(exp(4*I)/2 + exp(-4*I)/2) + 6*exp(-exp(-4*I)/2 - exp(4*I)/2))), y - 1],
+    dict=True) == [{x: 12*cosh(cos(4)), y: 1}]
+
+
 def test_issue_4886():
     z = a*sqrt(R**2*a**2 + R**2*b**2 - c**2)/(a**2 + b**2)
     t = b*c/(a**2 + b**2)
