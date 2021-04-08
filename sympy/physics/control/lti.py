@@ -929,7 +929,7 @@ class Series(Basic):
 
         """
         return self.doit().is_biproper
-        
+
     @property
     def is_SISO(self):
         if self._is_not_Matrix:
