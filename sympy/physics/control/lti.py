@@ -932,7 +932,7 @@ class Series(Basic):
 
     @property
     def is_SISO(self):
-        if self._is_not_Matrix:
+        if self._is_not_matrix:
             return True
         else:
             return False
