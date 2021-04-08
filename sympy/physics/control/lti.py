@@ -936,7 +936,6 @@ class Series(Basic):
             return True
         else:
             return False
-
 class Parallel(Basic):
     """
     A class for representing addition of transfer functions or transfer functions
