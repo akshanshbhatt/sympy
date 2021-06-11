@@ -551,7 +551,7 @@ class TransferFunction(Basic, EvalfMixin):
 
         """
         return degree(self.num, self.var) == degree(self.den, self.var)
-    
+
     def to_expr(self):
         return Mul(self.num, Pow(self.den, -1, evaluate=False), evaluate=False)
 
