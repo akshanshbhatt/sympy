@@ -172,7 +172,7 @@ class TransferFunction(Basic, EvalfMixin):
             obj._num = num
             obj._den = den
             obj._var = var
-            obj._num_inputs, obj._num_outputs = 1, 1 #TODO: Remove _num_inputs and _num_outputs for TF
+            obj._num_inputs, obj._num_outputs = 1, 1 # TODO: Remove _num_inputs and _num_outputs for TF and everywhere else except TFM
             return obj
         else:
             raise TypeError("Unsupported type for numerator or denominator of TransferFunction.")
@@ -238,6 +238,8 @@ class TransferFunction(Basic, EvalfMixin):
         """
         return self._var
 
+    # TODO: Remove num_inputs, num_outputs and shape from TF
+
     @property
     def num_inputs(self):
         return self._num_inputs
@@ -249,6 +251,8 @@ class TransferFunction(Basic, EvalfMixin):
     @property
     def shape(self):
         return self._num_outputs, self._num_inputs
+
+    # TODO: subs should return expr instead of TF
 
     def _eval_subs(self, old, new):
         arg_num = self.num.subs(old, new)
@@ -266,6 +270,8 @@ class TransferFunction(Basic, EvalfMixin):
         tf = cancel(Mul(self.num, 1/self.den, evaluate=False), expand=False).as_numer_denom()
         num_, den_ = tf[0], tf[1]
         return TransferFunction(num_, den_, self.var)
+
+    # TODO: Implement expand(tf) by default and remove it from here.
 
     def expand(self):
         """
@@ -438,6 +444,8 @@ class TransferFunction(Basic, EvalfMixin):
                     "of the Laplace transform.")
             arg_list = list(other.args)
             return Series(self, *arg_list)
+        elif other == -1:
+            return -self # Matrices compute -A internally by -1*element(A) for all element(A)
         else:
             raise ValueError("TransferFunction cannot be multiplied with {}."
                 .format(type(other)))
@@ -552,7 +560,9 @@ class TransferFunction(Basic, EvalfMixin):
         """
         return degree(self.num, self.var) == degree(self.den, self.var)
 
-    def to_expr(self):
+    # TODO: to_expr() will convert TF to expr type. As Matrix addition/multiplication is only allowed for expr type.
+
+    def _to_expr(self):
         return Mul(self.num, Pow(self.den, -1, evaluate=False), evaluate=False)
 
 class Series(Basic):
@@ -605,6 +615,9 @@ class Series(Basic):
     Parallel, TransferFunction, Feedback
 
     """
+
+    # TODO: Series implementation for TFM
+
     def __new__(cls, *args, evaluate=False):
         # if len(args) == 0:
         #     raise ValueError("Needs at least 1 argument.")
@@ -691,6 +704,8 @@ class Series(Basic):
     @property
     def shape(self):
         return self._num_outputs, self._num_inputs
+
+    # TODO: Implement Series().doit() for tfm. Matrix multiplication of ImmutableMatrices can be used
 
     def doit(self, **kwargs):
         """
@@ -1113,17 +1128,21 @@ class Parallel(Basic):
                     else:
                         num_, den_ = res.num * arg.den + res.den * arg.num, res.den * arg.den
                     res = TransferFunction(num_, den_, self.var)
+
+                # TODO: Implement Parallel().doit() for TFM
+
                 else:
-                    if self.num_inputs == 1:
-                        a = [None] * self.num_outputs
-                        for x in range(self.num_outputs):
-                            a[x] = res.args[0][x] + arg.args[0][x]
-                    else:
-                        a = [[None] * self.num_inputs for _ in range(self.num_outputs)]
-                        for row in range(self.num_outputs):
-                            for col in range(self.num_inputs):
-                                a[row][col] = res.args[0][row][col] + arg.args[0][row][col]
-                    res = TransferFunctionMatrix(a, self.shape, self.var)
+                    # if self.num_inputs == 1:
+                    #     a = [None] * self.num_outputs
+                    #     for x in range(self.num_outputs):
+                    #         a[x] = res.args[0][x] + arg.args[0][x]
+                    # else:
+                    #     a = [[None] * self.num_inputs for _ in range(self.num_outputs)]
+                    #     for row in range(self.num_outputs):
+                    #         for col in range(self.num_inputs):
+                    #             a[row][col] = res.args[0][row][col] + arg.args[0][row][col]
+                    # res = TransferFunctionMatrix(a, self.shape, self.var)
+                    pass
         return res
 
     def _eval_rewrite_as_TransferFunction(self, *args, **kwargs):
@@ -1809,6 +1828,8 @@ class TransferFunctionMatrix(ImmutableMatrix, Basic):
         """
         return self._num_outputs
 
+    # shape property does not needs to be defined now.
+
     # @property
     # def shape(self):
     #     """
@@ -1911,7 +1932,8 @@ class TransferFunctionMatrix(ImmutableMatrix, Basic):
                 raise ValueError("Both TransferFunctionMatrix objects should use the same"
                     " complex variable of the Laplace transform.")
             else:
-                return Series(self, other)
+                # Remember: Series(A, B) = B*A and NOT A*B
+                return Series(other, self)
         else:
             raise ValueError("TransferFunctionMatrix cannot be multiplied with {}."
                 .format(type(other)))
@@ -1947,27 +1969,37 @@ class TransferFunctionMatrix(ImmutableMatrix, Basic):
         TransferFunctionMatrix([[TransferFunction(s**3 - 2, s**4 + 5*s + 6, s), TransferFunction((s**3 - 2)*(s**4 + 1) + (-a*s + 4)*(s**4 + 5*s + 6), (s**4 + 1)*(s**4 + 5*s + 6), s), TransferFunction((2 - s**3)*(-p + s)*(s**4 + 1) + ((-p + s)*(a*s - 4) + (s**4 + 1)*(-a*p**2 - b*s))*(s**4 + 5*s + 6), (-p + s)*(s**4 + 1)*(s**4 + 5*s + 6), s)], [TransferFunction((2 - s**3)*(a*p**2 + b*s), (-p + s)*(s**4 + 5*s + 6), s), TransferFunction((s**3 - 2)*(-a*p**2 - b*s)*(a*s - 4), (-p + s)*(s**4 + 1)*(s**4 + 5*s + 6), s), TransferFunction(-a*s + 4, s**4 + 1, s)]])
 
         """
-        if self.num_inputs == 1:
-            arg_matrix = list(self.args[0])
-            for row in range(self.num_outputs):
-                arg_matrix[row] = arg_matrix[row].doit()
-        else:
-            arg_matrix = []
-            for row in range(self.num_outputs):
-                arg_matrix.append(list(self.args[0][row]))
 
-            for row in range(self.num_outputs):
-                for col in range(self.num_inputs):
-                    arg_matrix[row][col] = arg_matrix[row][col].doit()
+        # TODO: Implement todo() for TFM. For now, it returns itself.
 
-        return TransferFunctionMatrix(arg_matrix)
 
-    def __neg__(self):
-        if self.num_inputs == 1:
-            neg_args = [-col for col in self.args[0]]
-        else:
-            neg_args = [[-col for col in row] for row in self.args[0]]
-        return TransferFunctionMatrix(neg_args)
+        # if self.num_inputs == 1:
+        #     arg_matrix = list(self.args[0])
+        #     for row in range(self.num_outputs):
+        #         arg_matrix[row] = arg_matrix[row].doit()
+        # else:
+        #     arg_matrix = []
+        #     for row in range(self.num_outputs):
+        #         arg_matrix.append(list(self.args[0][row]))
+
+        #     for row in range(self.num_outputs):
+        #         for col in range(self.num_inputs):
+        #             arg_matrix[row][col] = arg_matrix[row][col].doit()
+
+        return self #TransferFunctionMatrix(arg_matrix)
+
+    # def __neg__(self):
+    #     if self.num_inputs == 1:
+    #         neg_args = [-col for col in self.args[0]]
+    #     else:
+    #         neg_args = [[-col for col in row] for row in self.args[0]]
+    #     return TransferFunctionMatrix(neg_args)
+
+    # TODO: converts <class 'sympy.physics.control.lti.TransferFunctionMatrix'> to
+    # <class 'sympy.matrices.immutable.ImmutableDenseMatrix'> for easing the matrix operations.
+
+    def _to_Immutable_Matrix(self):
+        return ImmutableMatrix(self.args[0], self.args[1], list(self.args[2]))
 
     @property
     def is_proper(self):
