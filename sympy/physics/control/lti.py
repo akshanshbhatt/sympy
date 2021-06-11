@@ -1651,7 +1651,7 @@ class TransferFunctionMatrix(ImmutableMatrix, Basic):
 
         if not (isinstance(arg, list)):
             raise TypeError("Unsupported type for argument of TransferFunctionMatrix.")
-        
+
         if not all(isinstance(arg[row][col], (TransferFunction, Series, Parallel, Expr, int, float))
                 for col in range(len(arg[0])) for row in range(len(arg))):
                 raise TypeError("All the lists/tuples in the first argument of TransferFunctionMatrix"
@@ -1682,12 +1682,6 @@ class TransferFunctionMatrix(ImmutableMatrix, Basic):
         obj = super(TransferFunctionMatrix, cls).__new__(cls, arg)
         obj._var = arg[0][0].var
         obj._num_outputs, obj._num_inputs = obj.shape
-
-
-
-
-
-
 
         # if all(isinstance(i, (TransferFunction, Series, Parallel)) for i in arg):
         #     # TFM with 1st argument of the type - [tf1, tf2, tf3, ...] or (tf1, tf2, ...)
