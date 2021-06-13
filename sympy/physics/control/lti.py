@@ -22,7 +22,7 @@ def _roots(poly, var):
 class TransferFunction(Basic, EvalfMixin):
     r"""
     A class for representing LTI (Linear, time-invariant) systems that can be strictly described
-    by ratio of polynomials in the Laplace Transform complex variable. The arguments
+    by ratio of polynomials in the Laplace transform complex variable. The arguments
     are ``num``, ``den``, and ``var``, where ``num`` and ``den`` are numerator and
     denominator polynomials of the ``TransferFunction`` respectively, and the third argument is
     a complex variable of the Laplace transform used by these polynomials of the transfer function.
@@ -32,13 +32,13 @@ class TransferFunction(Basic, EvalfMixin):
     The numerator of the transfer function is the Laplace transform of the input signal
     (The signals are represented as functions of time) and similarly the denominator
     of the transfer function is the Laplace transform of the output signal. It is also a convention
-    to denote the Input and Output signal's laplace transform with capital alphabets like shown below.
+    to denote the input and output signal's Laplace transform with capital alphabets like shown below.
 
             $H(s) = \frac{Y(s)}{X(s)} = \frac{ \mathcal{L}\left\{y(t)\right\} }{ \mathcal{L}\left\{x(t)\right\} }$
 
     Transfer function, $H$, is generally given as a rational function in $s$ as-
 
-            $H\ =\ \frac{a_{n}s^{n}+a_{n-1}s^{n-1}+\dots+a_{1}s+a_{0}}{b_{m}s^{m}+b_{m-1}s^{m-1}+\dots+b_{1}s+b_{0}}$
+            $H(s) =\ \frac{a_{n}s^{n}+a_{n-1}s^{n-1}+\dots+a_{1}s+a_{0}}{b_{m}s^{m}+b_{m-1}s^{m-1}+\dots+b_{1}s+b_{0}}$
 
     For more info, refer -
 
@@ -50,7 +50,7 @@ class TransferFunction(Basic, EvalfMixin):
     num : Expr, Number
         The numerator polynomial of the transfer function. Users
         can also pass the entire rational expression of the
-        Transfer Function, without explicitly passing the den
+        transfer function, without explicitly passing the den
         parameter. It will be adjusted accordingly.
     den : Expr, Number, optional
         The denominator polynomial of the transfer function. If
@@ -96,8 +96,8 @@ class TransferFunction(Basic, EvalfMixin):
     >>> tf1.args
     (a + s, s**2 + s + 1, s)
 
-    `TransferFunction` instances can also be created simply by passing the rational
-    expression. SymPy will smartly create a `TransferFunction` object with the
+    ``TransferFunction`` instances can also be created simply by passing the rational
+    expression. SymPy will smartly create a ``TransferFunction`` object with the
     properties of the expression.
 
     >>> expr = (s + 5)/(3*s**2 + 2*s + 1)
@@ -121,8 +121,8 @@ class TransferFunction(Basic, EvalfMixin):
 
     Any complex variable can be used for ``var``.
 
-    >>> expr1 = (a*p**3 - a*p**2 + s*p)/(p + a**2)
-    >>> tf2 = TransferFunction(expr, var=p)  # Expr with more than one variables
+    >>> expr1 = (a*p**3 - a*p**2 + s*p)/(p + a**2)  # Expr with more than one variables
+    >>> tf2 = TransferFunction(expr, var=p)
     >>> tf2
     TransferFunction(a*p**3 - a*p**2 + p*s, a**2 + p, p)
     >>> tf3 = TransferFunction((p + 3)*(p - 1), (p - 1)*(p + 5), p)
